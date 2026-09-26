@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Нефтяные месторождения России</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+        .info-panel {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            z-index: 1000;
+            max-width: 300px;
+        }
+        .info-panel h2 {
+            margin-top: 0;
+            color: #333;
+            font-size: 18px;
+        }
+        .field-item {
+            margin: 8px 0;
+            padding: 8px;
+            background: #f5f5f5;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .field-item:hover {
+            background: #e0e0e0;
+        }
+        .field-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .field-region {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="info-panel">
+        <h2>🛢️ Нефтяные месторождения</h2>
+        <div id="fields-list"></div>
+    </div>
+
+    <script>
+        // Данные о месторождениях
+        const fields = [
+            {
+                name: "Самотлорское",
+                coords: [61.167222, 76.665556],
+                region: "Ханты-Мансийский АО",
+                description: "Крупнейшее нефтяное месторождение России. Открыто в 1965 г. Расположено в 15-60 км от Нижневартовска."
+            },
+            {
+                name: "Крапивинское",
+                coords: [58.0173, 75.6324],
+                region: "Томская область",
+                description: "Расположено в Каргасокском районе, в 600 км от Томска."
+            },
+            {
+                name: "Салымское",
+                coords: [60.35, 70.8],
+                region: "Ханты-Мансийский АО",
+                description: "Открыто в 1965 г., в эксплуатации с 1974 г. Расположено в 120 км к юго-западу от Сургута."
+            },
+            {
+                name: "Ромашкинское",
+                coords: [54.572778, 52.370556],
+                region: "Республика Татарстан",
+                description: "Супергигантское месторождение на юго-востоке Татарстана. Открыто в 1948 г."
+            },
+            {
+                name: "Арланское",
+                coords: [55.943611, 54.124722],
+                region: "Республика Башкортостан",
+                description: "Крупнейшее по запасам нефти на северо-западе Башкортостана."
+            },
+            {
+                name: "Туймазинское",
+                coords: [54.551667, 53.500278],
+                region: "Республика Башкортостан",
+                description: "Одно из крупнейших в мире. Расположено в 180 км от Уфы."
+            },
+            {
+                name: "Возейское",
+                coords: [66.708889, 56.819167],
+                region: "Республика Коми",
+                description: "Расположено в Усинском районе, в 5 км от села Усть-Уса. Открыто в 1971 г."
+            },
+            {
+                name: "Ярегское",
+                coords: [63.483333, 53.75],
+                region: "Республика Коми",
+                description: "Уникальное месторождение высоковязкой нефти. Открыто в 1932 г. Добыча шахтным способом."
+            },
+            {
+                name: "Анастасиевско-Троицкое",
+                coords: [45.107778, 37.995833],
+                region: "Краснодарский край",
+                description: "Крупнейшее месторождение Краснодарского края. Расположено в Славянском районе."
+            },
+            {
+                name: "Эльдаровское",
+                coords: [43.8, 45.2],
+                region: "Чеченская Республика",
+                description: "Расположено в 60 км к северо-западу от г. Грозный."
+            }
+        ];
+
+        // Инициализация карты
+        const map = L.map('map').setView([60, 55], 4);
+
+        // Добавление слоя OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Иконка для маркеров
+        const oilIcon = L.divIcon({
+            className: 'custom-marker',
+            html: '🛢️',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+
+        // Добавление маркеров на карту
+        fields.forEach(field => {
+            const marker = L.marker(field.coords, {icon: oilIcon}).addTo(map);
+            
+            const popupContent = `
+                <div style="min-width: 200px;">
+                    <h3 style="margin: 0 0 10px 0; color: #2c3e50;">${field.name}</h3>
+                    <p style="margin: 5px 0;"><strong>Регион:</strong> ${field.region}</p>
+                    <p style="margin: 5px 0;"><strong>Координаты:</strong> ${field.coords[0].toFixed(4)}° с.ш., ${field.coords[1].toFixed(4)}° в.д.</p>
+                    <p style="margin: 5px 0;">${field.description}</p>
+                </div>
+            `;
+            
+            marker.bindPopup(popupContent);
+        });
+
+        // Создание списка месторождений
+        const fieldsList = document.getElementById('fields-list');
+        fields.forEach(field => {
+            const div = document.createElement('div');
+            div.className = 'field-item';
+            div.innerHTML = `
+                <div class="field-name">🛢️ ${field.name}</div>
+                <div class="field-region">${field.region}</div>
+            `;
+            div.addEventListener('click', () => {
+                map.setView(field.coords, 8);
+                L.popup(field.coords)
+                    .setContent(`<strong>${field.name}</strong><br>${field.region}`)
+                    .openOn(map);
+            });
+            fieldsList.appendChild(div);
+        });
+
+        // Добавление слоя с границами регионов (опционально)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            opacity: 0
+        });
+    </script>
+</body>
+</html>
